@@ -304,7 +304,7 @@ void loop()
 
   JY901.GetAngle(); Serial.print(" H");
 
-  Serial.println((int)((float)JY901.stcAngle.Angle[2]/32768*180));
+  Serial.print((int)((float)JY901.stcAngle.Angle[2]/32768*180));
 
 
 
@@ -314,9 +314,9 @@ void loop()
 
   
 
-  Serial.println(Input);
+  //Serial.println(Input);
 
-  Serial.println(Output);
+  //Serial.println(Output);
 
   
 
@@ -364,7 +364,6 @@ void loop()
 
 
 
-  /*
 
   float voltage = 0;
 
@@ -384,7 +383,7 @@ void loop()
 
   Serial.print(" P"); Serial.println(power);//W
 
-  */
+
 
   
 
