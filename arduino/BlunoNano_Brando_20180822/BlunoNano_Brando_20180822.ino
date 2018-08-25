@@ -163,6 +163,7 @@ void loop()
   //print IMU
   JY901.GetAngle(); Serial.print(" H");
   Serial.print((int)((float)JY901.stcAngle.Angle[2]/32768*180)+180);
+  Serial.print(" h"); Serial.print(Setpoint);
 
   //Current and Voltage
   float voltage = 0;
@@ -186,9 +187,11 @@ void loop()
       myPID.Compute();
       int Output_temp = 90 - Output;
       if (Output_temp < rud_range_min){
-      myservo2.write(rud_range_min);
+        myservo2.write(rud_range_min);
+        pos2=rud_range_min;
       } else {
         myservo2.write(Output_temp);
+        pos2=Output_temp;
       }
     }
     //condition 1, case 2
@@ -201,9 +204,11 @@ void loop()
       myPID.Compute();
       int Output_temp = 90 + Output;
       if (Output_temp > rud_range_max){
-      myservo2.write(rud_range_max);
+        myservo2.write(rud_range_max);
+        pos2=rud_range_max;
       } else {
       myservo2.write(Output_temp);
+      pos2=Output_temp;
       }
     }
   }
@@ -217,8 +222,10 @@ void loop()
       int Output_temp = 90 + Output;
       if (Output_temp > rud_range_max){
         myservo2.write(rud_range_max);
+        pos2=rud_range_max;
       }else {
         myservo2.write(Output_temp);
+        pos2=Output_temp;
       }
     }
     //condition 2, case 2
@@ -231,9 +238,11 @@ void loop()
       myPID.Compute();
       int Output_temp = 90 - Output;
       if (Output_temp < rud_range_min){
-      myservo2.write(rud_range_min);
+        myservo2.write(rud_range_min);
+        pos2=rud_range_min;
       } else {
         myservo2.write(Output_temp);
+        pos2=Output_temp;
       }
     }
   }
