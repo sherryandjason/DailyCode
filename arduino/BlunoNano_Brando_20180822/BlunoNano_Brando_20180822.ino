@@ -176,12 +176,69 @@ void loop()
   Serial.print(" P"); Serial.println(power);//W
   
   int IMU_temp=(int)((float)JY901.stcAngle.Angle[2]/32768*180)+180;
-  //IMU_temp=IMU_temp+180;
-  
-  //Serial.println(Input);
-  //Serial.println(Output);
-  
-  if(IMU_temp>Setpoint)
+
+  //First condition
+  if(Setpoint > 0 && Setpoint < 180)
+  { //condition 1, case 1
+    if(IMU_temp > Setpoint && IMU_temp < Setpoint + 180)
+    {
+      Input = 2 * Setpoint - IMU_temp;
+      myPID.Compute();
+      int Output_temp = 90 - Output;
+      if (Output_temp < rud_range_min){
+      myservo2.write(rud_range_min);
+      } else {
+        myservo2.write(Output_temp);
+      }
+    }
+    //condition 1, case 2
+    else {
+      if (IMU_temp>0 && IMU_temp < Setpoint+1){
+        Input=IMU_temp;
+      }else{
+        Input=IMU_temp-360;
+      }
+      myPID.Compute();
+      int Output_temp = 90 + Output;
+      if (Output_temp > rud_range_max){
+      myservo2.write(rud_range_max);
+      } else {
+      myservo2.write(Output_temp);
+      }
+    }
+  }
+  //Another condition
+  if(Setpoint > 179 && Setpoint < 361)
+  {
+    //condition 2, case 1
+    if (IMU_temp<Setpoint && IMU_temp > Setpoint-180+1){
+      Input=IMU_temp;
+      myPID.Compute();
+      int Output_temp = 90 + Output;
+      if (Output_temp > rud_range_max){
+        myservo2.write(rud_range_max);
+      }else {
+        myservo2.write(Output_temp);
+      }
+    }
+    //condition 2, case 2
+    else{
+      if (IMU_temp > Setpoint-1 && IMU_temp < 361){
+        Input = 2 * Setpoint - IMU_temp;
+      } else{
+        Input = 2 *Setpoint - (IMU_temp+360);
+      }
+      myPID.Compute();
+      int Output_temp = 90 - Output;
+      if (Output_temp < rud_range_min){
+      myservo2.write(rud_range_min);
+      } else {
+        myservo2.write(Output_temp);
+      }
+    }
+  }
+  /**
+  if(IMU_temp>Setpoint || IMU_temp<)
   {  // turn right
     Input = 2 * Setpoint - IMU_temp;
     myPID.Compute();
@@ -202,6 +259,6 @@ void loop()
       myservo2.write(Output_temp);
         }
   }
-  
+  **/
   delay(100);
 }
