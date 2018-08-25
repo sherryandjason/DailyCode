@@ -67,7 +67,7 @@ Adafruit_INA219 sensor;
 //Define Variables we'll be connecting to
 double Setpoint, Input, Output;
 //Specify the links and initial tuning parameters
-PID myPID(&Input, &Output, &Setpoint,1,0,0, DIRECT);
+PID myPID(&Input, &Output, &Setpoint,0.5,0,0.01, DIRECT);
 
 void setup() 
 {
@@ -126,6 +126,17 @@ void loop()
       myservo2.write(pos2);
       inString = "";
     }
+
+    if ((char)inChar == 'D') {
+      do {
+        inChar = Serial.read();
+        inString += (char)inChar;
+      } while (isDigit(inChar));
+      int temp_heading=inString.toInt();
+      Setpoint=temp_heading;
+      inString = "";
+    }
+    
     if((char)inChar=='M'){
     modeSwitch=1-modeSwitch;
     if(modeSwitch==1)//2.4G
@@ -148,16 +159,27 @@ void loop()
   //print servo
   Serial.print(" S"); Serial.print(pos1);
   Serial.print(" R"); Serial.print(pos2);
-    
+  
   //print IMU
   JY901.GetAngle(); Serial.print(" H");
-  Serial.println((int)((float)JY901.stcAngle.Angle[2]/32768*180));
+  Serial.print((int)((float)JY901.stcAngle.Angle[2]/32768*180)+180);
 
+  //Current and Voltage
+  float voltage = 0;
+  float current = 0;
+  float power = 0;
+  voltage = sensor.getBusVoltage_V();//Get Voltage
+  current = sensor.getCurrent_mA();//Get Current
+  power = voltage * (current/1000); //Convert from mW to W
+  Serial.print(" V"); Serial.print(voltage);//V
+  Serial.print(" C"); Serial.print(current);//mA
+  Serial.print(" P"); Serial.println(power);//W
+  
   int IMU_temp=(int)((float)JY901.stcAngle.Angle[2]/32768*180)+180;
   //IMU_temp=IMU_temp+180;
   
-  Serial.println(Input);
-  Serial.println(Output);
+  //Serial.println(Input);
+  //Serial.println(Output);
   
   if(IMU_temp>Setpoint)
   {  // turn right
@@ -180,18 +202,6 @@ void loop()
       myservo2.write(Output_temp);
         }
   }
-
-  /*
-  float voltage = 0;
-  float current = 0;
-  float power = 0;
-  voltage = sensor.getBusVoltage_V();//Get Voltage
-  current = sensor.getCurrent_mA();//Get Current
-  power = voltage * (current/1000); //Convert from mW to W
-  Serial.print(" V"); Serial.print(voltage);//V
-  Serial.print(" C"); Serial.print(current);//mA
-  Serial.print(" P"); Serial.println(power);//W
-  */
   
   delay(100);
 }
