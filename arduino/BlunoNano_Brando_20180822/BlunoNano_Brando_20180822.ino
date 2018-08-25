@@ -45,6 +45,10 @@ double voltage = 0.0;
 double current = 0.0;
 int windD=0;
 
+//Zero angle
+int zero_angle=50; //anti-clock-wise is increasing
+int norm_IMU_temp=0;
+ 
 // Sail
 int sail_range_min = 30;  // available sail range minimun, vary from boat to boat
 int sail_range_max = 130;  // available sail range maximun, vary from boat to boat
@@ -165,6 +169,16 @@ void loop()
   Serial.print((int)((float)JY901.stcAngle.Angle[2]/32768*180)+180);
   Serial.print(" h"); Serial.print(Setpoint);
 
+  int IMU_temp=(int)((float)JY901.stcAngle.Angle[2]/32768*180)+180;
+
+  //Norm the IMU angle for sail
+  if(IMU_temp<zero_angle){
+    norm_IMU_temp=360-(zero_angle-IMU_temp);
+  } else{
+    norm_IMU_temp=IMU_temp-zero_angle;
+  }
+  Serial.print(" HN"); Serial.print(norm_IMU_temp);
+
   //Current and Voltage
   float voltage = 0;
   float current = 0;
@@ -175,8 +189,24 @@ void loop()
   Serial.print(" V"); Serial.print(voltage);//V
   Serial.print(" C"); Serial.print(current);//mA
   Serial.print(" P"); Serial.println(power);//W
-  
-  int IMU_temp=(int)((float)JY901.stcAngle.Angle[2]/32768*180)+180;
+
+  //auto sail
+  if (norm_IMU_temp>0 && norm_IMU_temp<180)
+  {
+    int dead_angle=90-norm_IMU_temp;
+    if(dead_angle<37 && dead_angle>-21)
+    {
+      myservo1.write(sail_range_max);
+      pos1=sail_range_max;
+    } else{
+      pos1=sail_range_max-abs(dead_angle)/4;
+      myservo1.write(pos1);
+    }
+  }
+  else {
+    pos1=abs(norm_IMU_temp-290)/1.7;
+    myservo1.write(pos1); 
+  }
 
   //First condition
   if(Setpoint > 0 && Setpoint < 180)
