@@ -15,6 +15,7 @@ getSensor="start"
 getCommand="starT"
 rudder=""
 sail=""
+headingD=""
 xPosition=""
 yPosition=""
 def send():
@@ -39,29 +40,30 @@ def send():
 		#print("rudder:"+str(rudder)+"   Sail:"+str(sail))
 		#f.write("test sentence")
 	#command=('R110B').encode(encoding='utf-8')
+	
+def sendHeading():
+	global getCommand
+	global headingD
+	getCommand='D'+str(headingD)
+	command=getCommand.encode(encoding='utf-8')
+	ser.write(command)
+	time.sleep(0.1)
 
 	
 def read():
-	while True:
-		#database
-		cursor = db.cursor()
-		cursor.execute("SELECT * FROM data WHERE id=1")
-		dataSTAr = cursor.fetchone()
+	while True:		
 		global rudder
 		global sail
 		global xPosition
 		global yPosition
-		rudder=str(dataSTAr[2])
-		sail=str(dataSTAr[3])
-		xPosition=dataSTAr[4]
-		yPosition=dataSTAr[5]
+		
 		#Sensor
 		global getSensor
 		line = ser.readline()
 		if line:
 			result = line.strip().decode()
 			getSensor=result
-			print(str(rudder)+ "  " + str(sail))
+			print(str(xPosition)+ "  " + str(yPosition))
 			print(result)
 			timeFlag=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			with open('record_comSailboat_Brando.txt', 'a') as f:
@@ -74,9 +76,46 @@ def read():
 
 		time.sleep(0.01)
 		
-	
+def auto():
+	while True:
+		global headingD
+		global rudder
+		global sail
+		global xPosition
+		global yPosition
 		
-
+		#database
+		cursor = db.cursor()
+		cursor.execute("SELECT * FROM data WHERE id=1")
+		dataSTAr = cursor.fetchone()
+		rudder=str(dataSTAr[2])
+		sail=str(dataSTAr[3])
+		xPosition=dataSTAr[4]
+		yPosition=dataSTAr[5]
+		
+		temp_x=dataSTAr[4]+0
+		temp_y=dataSTAr[5]+0
+		
+		xL=200
+		xR=800
+		yU=500
+		yD=900
+		if temp_y > yD:
+			headingD=220
+			print("YES220")
+		if temp_y < yU:
+			headingD=60
+			print("YES60U")
+		if temp_x > xR:
+			headingD=330
+			print("test330")
+		if temp_x < xL:
+			headingD=60;
+			print("YES60L")
+		sendHeading()
+		print("pass")
+	
+	
 	
 """
 def controlFunction():
@@ -92,15 +131,15 @@ def controlFunction():
 
 t1=threading.Thread(target=send)
 t2=threading.Thread(target=read)
-#t3=threading.Thread(target=dataBase)
+t3=threading.Thread(target=auto)
 #t4=threading.Thread(target=toRecord)
 t1.setDaemon(False)
 t2.setDaemon(False)
-#t3.setDaemon(False)
+t3.setDaemon(False)
 #t4.setDaemon(False)
 t1.start()
 t2.start()
-#t3.start()
+t3.start()
 #t4.start()
 #f.close()
 
