@@ -1,5 +1,6 @@
 /*
 reConminiSailBot
+2018-08-24 ADD: PID Control
 */
 
 /* Hardware connection*/
@@ -29,6 +30,7 @@ Analog A1
 #include <JY901.h>
 #include <Servo.h>
 #include <Adafruit_INA219.h>
+#include <PID_v1.h>
 
 #define WD_PIN A1
 
@@ -44,6 +46,14 @@ double voltage = 0.0;
 double current = 0.0;
 int windD=0;
 
+// Sail
+int sail_range_min = 30;  // available sail range minimun, vary from boat to boat
+int sail_range_max = 130;  // available sail range maximun, vary from boat to boat
+// Rudder
+int rud_range_min = 40;  // available rudder range minimun, vary from boat to boat
+int rud_range_max = 120;  // available rudder range maximun, vary from boat to boat
+
+
 //Servo
 Servo myservo1;
 Servo myservo2;
@@ -56,6 +66,11 @@ char c;
 
 //Current voltage sensor
 Adafruit_INA219 sensor;
+
+
+//PID
+double Setpoint, Input, Output;
+PID myPID(&Input, &Output, &Setpoint,1,0,0, DIRECT);
 
 void setup() 
 {
@@ -73,6 +88,8 @@ void setup()
       delay(1);
   }
   sensor.begin();
+  Setpoint = 100;
+  myPID.SetMode(AUTOMATIC);
 } 
 
 void loop() 
@@ -87,11 +104,11 @@ void loop()
       } while (isDigit(inChar));
       pos1=inString.toInt();
 
-      if(pos1>=30&&pos1<=90)
+      if(pos1>=30&&pos1<=130)
       {
         pos1bac=pos1;
       }
-      if((pos1<30&&pos1>0)||(pos1>90&&pos1<360)||pos1==0)
+      if((pos1<30&&pos1>0)||(pos1>130&&pos1<360)||pos1==0)
       {
         pos1=pos1bac;
       }
@@ -116,6 +133,17 @@ void loop()
       myservo2.write(pos2);
       inString = "";
     }
+
+    if ((char)inChar == 'D') {
+      do {
+        inChar = Serial.read();
+        inString += (char)inChar;
+      } while (isDigit(inChar));
+      int temp_heading=inString.toInt();
+      Setpoint=temp_heading;
+      inString = "";
+    }
+    
     if((char)inChar=='M'){
     modeSwitch=1-modeSwitch;
     if(modeSwitch==1)//2.4G
@@ -141,7 +169,7 @@ void loop()
     
   //print IMU
   JY901.GetAngle(); Serial.print(" H");
-  Serial.print((int)((float)JY901.stcAngle.Angle[2]/32768*180));
+  Serial.print((int)((float)JY901.stcAngle.Angle[2]/32768*180)+180);
   JY901I.GetAngle(); Serial.print(" I");
   Serial.print((int)((float)JY901I.stcAngle.Angle[2]/32768*180));
   JY901J.GetAngle(); Serial.print(" J");
@@ -150,6 +178,29 @@ void loop()
   Serial.print((int)((float)JY901K.stcAngle.Angle[2]/32768*180));
   JY901L.GetAngle(); Serial.print(" L");
   Serial.print((int)((float)JY901L.stcAngle.Angle[2]/32768*180));
+
+  int IMU_temp=(int)((float)JY901.stcAngle.Angle[2]/32768*180)+180;
+  if(IMU_temp>Setpoint)
+  {  // turn right
+    Input = 2 * Setpoint - IMU_temp;
+    myPID.Compute();
+    int Output_temp = 90 - Output;
+    if (Output_temp < rud_range_min){
+      myservo2.write(rud_range_min);
+      } else {
+        myservo2.write(Output_temp);
+      }
+  }
+  else{  // turn left
+    Input = IMU_temp;
+    myPID.Compute();
+    int Output_temp = 90 + Output;
+    if (Output_temp > rud_range_max){
+      myservo2.write(rud_range_max);
+      } else {
+      myservo2.write(Output_temp);
+        }
+  }
 
   float voltage = 0;
   float current = 0;
