@@ -13,6 +13,7 @@ db=pymysql.connect("192.168.0.102","root","root","star")
 ser=serial.Serial("COM8", 57600)
 getSensor="start"
 getCommand="starT"
+getCommandD="starD"
 rudder=""
 sail=""
 headingD=""
@@ -42,10 +43,10 @@ def send():
 	#command=('R110B').encode(encoding='utf-8')
 	
 def sendHeading():
-	global getCommand
+	global getCommandD
 	global headingD
-	getCommand='D'+str(headingD)
-	command=getCommand.encode(encoding='utf-8')
+	getCommandD='D'+str(headingD)
+	command=getCommandD.encode(encoding='utf-8')
 	ser.write(command)
 	time.sleep(0.1)
 
@@ -67,7 +68,7 @@ def read():
 			print(result)
 			timeFlag=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			with open('record_comSailboat_Brando.txt', 'a') as f:
-				f.write(str(timeFlag)+" "+str(getCommand))
+				f.write(str(timeFlag)+" "+str(getCommand)+ " " +str(getCommandD))
 				f.write(" xPosition: "+str(xPosition)+" yPosition: "+str(yPosition))
 				f.write(" dataBaseRudder: "+str(rudder)+" dataBaseSail: "+str(sail))
 				f.write(" "+str(getSensor)+" EOF")
