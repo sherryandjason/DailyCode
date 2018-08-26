@@ -46,7 +46,7 @@ double current = 0.0;
 int windD=0;
 
 //Zero angle
-int zero_angle=50; //anti-clock-wise is increasing
+int zero_angle=40; //anti-clock-wise is increasing
 int norm_IMU_temp=0;
  
 // Sail
@@ -205,6 +205,9 @@ void loop()
   }
   else {
     pos1=abs(norm_IMU_temp-290)/1.7;
+    if(pos1<sail_range_min){
+      pos1=sail_range_min;
+    }
     myservo1.write(pos1); 
   }
 
