@@ -60,6 +60,7 @@ int pos1=90;
 int pos2=90;
 int pos1bac=90;
 int pos2bac=90;
+double SetpointBac=60;
 int rud_range_min = 40;  // available rudder range minimun, vary from boat to boat
 int rud_range_max = 120;  // available rudder range maximun, vary from boat to boat
 String inString="";
@@ -75,7 +76,6 @@ PID myPID(&Input, &Output, &Setpoint,0.5,0,0.01, DIRECT);
 
 void setup() 
 {
-  
   JY901.StartIIC(0x50);
   myservo1.attach(6);//the servo control used PWM
   myservo2.attach(5);//the servo control used PWM
@@ -138,6 +138,7 @@ void loop()
       } while (isDigit(inChar));
       int temp_heading=inString.toInt();
       Setpoint=temp_heading;
+      SetpointBac=Setpoint;      
       inString = "";
     }
     
@@ -160,6 +161,12 @@ void loop()
   inString = "";
   //Change the mode of control
 
+  //Detect abnormal of setpoint heading
+  if(Setpoint==100)
+  {
+    Setpoint=SetpointBac;
+  }//If happened, set the heading to backup.
+      
   //print servo
   Serial.print(" S"); Serial.print(pos1);
   Serial.print(" R"); Serial.print(pos2);
