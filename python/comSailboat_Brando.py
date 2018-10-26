@@ -6,11 +6,11 @@ import threading
 import datetime
 
 #global command=''
-db=pymysql.connect("192.168.0.102","root","root","star")
+db=pymysql.connect("192.168.0.104","root","root","star")
 
 #f=open('record.txt', 'a')
  
-ser=serial.Serial("COM8", 57600)
+ser=serial.Serial("COM6", 57600)
 getSensor="start"
 getCommand="starT"
 getCommandD="starD"
@@ -132,15 +132,15 @@ def controlFunction():
 
 t1=threading.Thread(target=send)
 t2=threading.Thread(target=read)
-t3=threading.Thread(target=auto)
+#t3=threading.Thread(target=auto)
 #t4=threading.Thread(target=toRecord)
 t1.setDaemon(False)
 t2.setDaemon(False)
-t3.setDaemon(False)
+#t3.setDaemon(False)
 #t4.setDaemon(False)
 t1.start()
 t2.start()
-t3.start()
+#t3.start()
 #t4.start()
 #f.close()
 
