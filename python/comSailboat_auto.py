@@ -6,11 +6,11 @@ import threading
 import datetime
 
 #global command=''
-db=pymysql.connect("192.168.0.102","root","root","star")
+db=pymysql.connect("192.168.0.104","root","root","star")
 
 #f=open('record.txt', 'a')
  
-ser=serial.Serial("COM8", 57600)
+ser=serial.Serial("COM6", 57600)
 getSensor="start"
 getCommand="starT"
 getCommandD="starD"
@@ -67,7 +67,7 @@ def read():
 			print(str(xPosition)+ "  " + str(yPosition))
 			print(result)
 			timeFlag=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-			with open('record_comSailboat_Brando.txt', 'a') as f:
+			with open('record_comSailboat_auto.txt', 'a') as f:
 				f.write(str(timeFlag)+" "+str(getCommand)+ " " +str(getCommandD))
 				f.write(" xPosition: "+str(xPosition)+" yPosition: "+str(yPosition))
 				f.write(" dataBaseRudder: "+str(rudder)+" dataBaseSail: "+str(sail))
@@ -97,9 +97,9 @@ def auto():
 		temp_x=dataSTAr[4]+0
 		temp_y=dataSTAr[5]+0
 		
-		xL=200
-		xR=800
-		yU=500
+		xL=300
+		xR=900
+		yU=300
 		yD=900
 		if temp_y > yD:
 			headingD=220
