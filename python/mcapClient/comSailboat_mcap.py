@@ -4,6 +4,7 @@ import serial
 import math
 import threading
 import datetime
+from NatNetClient import NatNetClient
 
 #global command=''
 db=pymysql.connect("192.168.0.104","root","root","star")
@@ -19,6 +20,27 @@ sail=""
 headingD=""
 xPosition=""
 yPosition=""
+mcapPosition=""
+
+
+def receiveNewFrame( frameNumber, markerSetCount, unlabeledMarkersCount, rigidBodyCount, skeletonCount, labeledMarkerCount, timecode, timecodeSub, timestamp, isRecording, trackedModelsChanged ):
+	Received=""
+	#print( "Received frame", frameNumber )
+
+def receiveRigidBodyFrame( id, position, rotation ):
+	global mcapPosition
+	mcapPosition=position
+	#print( "Received frame for rigid body", id )
+	#print( "Received frame for rigid body", position )
+	#print(position[0])
+	#print( "Received frame for rigid body", rotation )
+
+def receivemCap():
+	streamingClient = NatNetClient()
+	streamingClient.newFrameListener = receiveNewFrame
+	streamingClient.rigidBodyListener = receiveRigidBodyFrame
+	streamingClient.run()
+
 def send():
 	while True:
 		global getCommand
@@ -57,6 +79,10 @@ def read():
 		global sail
 		global xPosition
 		global yPosition
+		global mcapPosition
+		
+		
+		print(mcapPosition)
 		
 		#Sensor
 		global getSensor
@@ -73,8 +99,6 @@ def read():
 				f.write(" dataBaseRudder: "+str(rudder)+" dataBaseSail: "+str(sail))
 				f.write(" "+str(getSensor)+" EOF")
 				f.write("\n")
-			
-
 		time.sleep(0.01)
 		
 def auto():
@@ -134,14 +158,17 @@ t1=threading.Thread(target=send)
 t2=threading.Thread(target=read)
 #t3=threading.Thread(target=auto)
 #t4=threading.Thread(target=toRecord)
+t5=threading.Thread(target=receivemCap)
 t1.setDaemon(False)
 t2.setDaemon(False)
 #t3.setDaemon(False)
 #t4.setDaemon(False)
+t5.setDaemon(False)
 t1.start()
 t2.start()
 #t3.start()
 #t4.start()
+t5.start()
 #f.close()
 
 	
