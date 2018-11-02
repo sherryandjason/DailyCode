@@ -22,7 +22,7 @@ headingD=""
 xPosition=""
 yPosition=""
 mcapPosition=(0,0,0)
-
+mcapXYZ=(0,0,0)
 
 def receiveNewFrame( frameNumber, markerSetCount, unlabeledMarkersCount, rigidBodyCount, skeletonCount, labeledMarkerCount, timecode, timecodeSub, timestamp, isRecording, trackedModelsChanged ):
 	Received=""
@@ -81,13 +81,14 @@ def read():
 		global xPosition
 		global yPosition
 		global mcapPosition
+		global mcapXYZ
 		#print(mcapPosition)
 		
 		mcapX=mcapPosition[0]*10
 		mcapY=mcapPosition[1]*10
 		mcapZ=mcapPosition[2]*10
 		mcapXYZ=(mcapX, mcapY, mcapZ)
-		print(mcapXYZ)
+		#print(mcapXYZ)
 		
 		#Sensor
 		global getSensor
@@ -114,21 +115,29 @@ def read():
 def auto():
 	while True:
 		global mcapPosition
+		global mcapXYZ
 		global getSensor
 		global headingD
 		global xPosition
 		global yPosition
 		
-		#database
+		'''
+		#database method
 		cursor = db.cursor()
 		cursor.execute("SELECT * FROM data WHERE id=1")
 		dataSTAr = cursor.fetchone()
 		xPosition=dataSTAr[4]
-		yPosition=dataSTAr[5]
-		
+		yPosition=dataSTAr[5]		
 		temp_x=dataSTAr[4]+0
 		temp_y=dataSTAr[5]+0
+		'''
 		
+		#Set the coordinate is in the left down corner
+		y0=-5
+		x0=-4
+		print(mcapXYZ[0]+x0,mcapXYZ[1]+y0)
+		
+		'''
 		xL=300
 		xR=900
 		yU=300
@@ -147,7 +156,8 @@ def auto():
 			print("YES60L")
 		sendHeading()
 		print("pass")
-	
+		'''
+		time.sleep(0.01)
 	
 	
 """
@@ -164,17 +174,17 @@ def controlFunction():
 
 t1=threading.Thread(target=send)
 t2=threading.Thread(target=read)
-#t3=threading.Thread(target=auto)
+t3=threading.Thread(target=auto)
 #t4=threading.Thread(target=toRecord)
 t5=threading.Thread(target=receivemCap)
 t1.setDaemon(False)
 t2.setDaemon(False)
-#t3.setDaemon(False)
+t3.setDaemon(False)
 #t4.setDaemon(False)
 t5.setDaemon(False)
 t1.start()
 t2.start()
-#t3.start()
+t3.start()
 #t4.start()
 t5.start()
 #f.close()
