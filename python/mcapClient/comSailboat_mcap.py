@@ -4,6 +4,7 @@ import serial
 import math
 import threading
 import datetime
+import re #regulization
 from NatNetClient import NatNetClient
 
 #global command=''
@@ -12,7 +13,7 @@ db=pymysql.connect("192.168.0.104","root","root","star")
 #f=open('record.txt', 'a')
  
 ser=serial.Serial("COM4", 57600)
-getSensor="start"
+getSensor=(0,0,0,0,0,0,0,0)
 getCommand="starT"
 getCommandD="starD"
 rudder=""
@@ -20,7 +21,7 @@ sail=""
 headingD=""
 xPosition=""
 yPosition=""
-mcapPosition=""
+mcapPosition=(0,0,0)
 
 
 def receiveNewFrame( frameNumber, markerSetCount, unlabeledMarkersCount, rigidBodyCount, skeletonCount, labeledMarkerCount, timecode, timecodeSub, timestamp, isRecording, trackedModelsChanged ):
@@ -30,9 +31,9 @@ def receiveNewFrame( frameNumber, markerSetCount, unlabeledMarkersCount, rigidBo
 def receiveRigidBodyFrame( id, position, rotation ):
 	global mcapPosition
 	mcapPosition=position
+	#print(mcapPosition)
 	#print( "Received frame for rigid body", id )
 	#print( "Received frame for rigid body", position )
-	#print(position[0])
 	#print( "Received frame for rigid body", rotation )
 
 def receivemCap():
@@ -80,20 +81,29 @@ def read():
 		global xPosition
 		global yPosition
 		global mcapPosition
+		#print(mcapPosition)
 		
-		
-		print(mcapPosition)
+		mcapX=mcapPosition[0]*10
+		mcapY=mcapPosition[1]*10
+		mcapZ=mcapPosition[2]*10
+		mcapXYZ=(mcapX, mcapY, mcapZ)
+		print(mcapXYZ)
 		
 		#Sensor
 		global getSensor
 		line = ser.readline()
 		if line:
 			result = line.strip().decode()
-			getSensor=result
-			print(str(xPosition)+ "  " + str(yPosition))
+			if result[0] !='S':
+				continue
+			resultBlock=result.split()
+			getSensor=re.findall(r'\d+', result)
+			print(getSensor)
+			#print(xPosition)
+			#print(str(xPosition)+ "  " + str(yPosition))
 			print(result)
 			timeFlag=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-			with open('record_comSailboat_auto.txt', 'a') as f:
+			with open('record_comSailboat_mcap.txt', 'a') as f:
 				f.write(str(timeFlag)+" "+str(getCommand)+ " " +str(getCommandD))
 				f.write(" xPosition: "+str(xPosition)+" yPosition: "+str(yPosition))
 				f.write(" dataBaseRudder: "+str(rudder)+" dataBaseSail: "+str(sail))
@@ -103,9 +113,9 @@ def read():
 		
 def auto():
 	while True:
+		global mcapPosition
+		global getSensor
 		global headingD
-		global rudder
-		global sail
 		global xPosition
 		global yPosition
 		
@@ -113,8 +123,6 @@ def auto():
 		cursor = db.cursor()
 		cursor.execute("SELECT * FROM data WHERE id=1")
 		dataSTAr = cursor.fetchone()
-		rudder=str(dataSTAr[2])
-		sail=str(dataSTAr[3])
 		xPosition=dataSTAr[4]
 		yPosition=dataSTAr[5]
 		
