@@ -25,6 +25,7 @@ xPosition=""
 yPosition=""
 mcapPosition=(0,0,0)
 mcapXYZ=(0,0,0)
+flagTurnBack=1
 
 def receiveNewFrame( frameNumber, markerSetCount, unlabeledMarkersCount, rigidBodyCount, skeletonCount, labeledMarkerCount, timecode, timecodeSub, timestamp, isRecording, trackedModelsChanged ):
 	Received=""
@@ -157,39 +158,49 @@ def auto():
 		xL=200
 		xR=-200
 		yU=-100
-		yD=200
-		flagTurnBack=1
-		headingR=215
-		headingL=60
+		yD=250
+		global flagTurnBack
+		headingL=220
+		headingR=60
 		IMU=getSensor_int[5]
 		Baro=getSensor_int[2]
 		setPoint=getSensor_int[4]
 		#print("setPoint",setPoint)
 		#print("IMU",getSensor_int[5])
 		#print("Baro",getSensor_int[2])		
-		if mcapXYZ[0]>xL:#need to turn right
-			headingD=60
+		if mcapXYZ[0]>xL and IMU>0 and IMU<220:#need to turn right
+			headingD=headingR
 			print("Right")
-			if mcapXYZ[0]>300 and mcapXYZ[0]<340 and IMU>140:
-				headingD=headingR
+			if mcapXYZ[0]>220 and mcapXYZ[0]<320 and IMU>180:
+				headingD=headingL
 				print("Right-Come on")
 			else:
-				headingD=60
+				headingD=headingR
 				print("Right-Come on-Done")
 			
 		if mcapXYZ[0]<xR:#need to turn left
-			headingD=headingR
+			headingD=headingL
 			print("Left")
-		if mcapXYZ[1]>yD:#need to upwind
+		if mcapXYZ[1]>yD and flagTurnBack==0:#need to upwind
 			if mcapXYZ[0]>0:
-				headingD=60
-			else:
 				headingD=headingR
+			else:
+				headingD=headingL
 			flagTurnBack=1
 			print("Up")
 		if mcapXYZ[1]<yU and mcapXYZ[0]<abs(xL-50):#need to downwind
-			if setPoint==headingR:
+			if setPoint==headingL:
 				headingD=330
+			elif setPoint==headingR:
+				if flagTurnBack==1:
+					headingD=headingL
+					sendHeading()
+					time.sleep(0.5)
+					flagTurnBack=0;
+				headingD=330
+			else:
+				headingD=330
+			flagTurnBack=0;
 			'''
 			elif mcapXYZ[0]:
 				if flagTurnBack==1:
