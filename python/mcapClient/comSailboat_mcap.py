@@ -116,6 +116,11 @@ def read():
 				f.write(" "+str(mcapXYZ))
 				f.write(" "+str(getSensor_int)+" EOF")
 				f.write("\n")
+			with open('record_comSailboat_mcap_Baro.txt','a') as w:
+				w.write(str(timeFlag))
+				w.write(" "+str(mcapXYZ[2])+" "+str(getSensor_int[2]))
+				w.write("\n")
+			
 		time.sleep(0.01)
 		
 def auto():
@@ -188,7 +193,7 @@ def auto():
 				headingD=headingL
 			flagTurnBack=1
 			print("Up")
-		if mcapXYZ[1]<yU and mcapXYZ[0]<abs(xL-50):#need to downwind
+		if mcapXYZ[1]<yU and mcapXYZ[0]<30 and mcapXYZ[0]>xR:#need to downwind
 			if setPoint==headingL:
 				headingD=330
 			elif setPoint==headingR:
