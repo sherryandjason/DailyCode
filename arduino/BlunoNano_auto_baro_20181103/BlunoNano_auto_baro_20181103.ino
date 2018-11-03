@@ -79,7 +79,7 @@ void setup()
   JY901.StartIIC(0x50);
   myservo1.attach(6);//the servo control used PWM
   myservo2.attach(5);//the servo control used PWM
-  Serial.begin(57600);
+  Serial.begin(115200);
   while (!Serial) {
       // will pause nano until serial console opens
       delay(1);
