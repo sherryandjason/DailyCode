@@ -12,8 +12,10 @@ db=pymysql.connect("192.168.0.104","root","root","star")
 
 #f=open('record.txt', 'a')
  
-ser=serial.Serial("COM4", 57600)
-getSensor=(0,0,0,0,0,0,0,0)
+#ser=serial.Serial("COM4", 57600)#For PC
+ser=serial.Serial("COM6", 57600)#For sailboat02
+getSensor=(0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+getSensor_int=(0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 getCommand="starT"
 getCommandD="starD"
 rudder=""
@@ -84,14 +86,15 @@ def read():
 		global mcapXYZ
 		#print(mcapPosition)
 		
-		mcapX=mcapPosition[0]*10
-		mcapY=mcapPosition[1]*10
-		mcapZ=mcapPosition[2]*10
+		mcapX=int(mcapPosition[0]*100)
+		mcapY=int(mcapPosition[1]*100)
+		mcapZ=int(mcapPosition[2]*100)
 		mcapXYZ=(mcapX, mcapY, mcapZ)
 		#print(mcapXYZ)
 		
 		#Sensor
 		global getSensor
+		global getSensor_int
 		line = ser.readline()
 		if line:
 			result = line.strip().decode()
@@ -99,7 +102,8 @@ def read():
 				continue
 			resultBlock=result.split()
 			getSensor=re.findall(r'\d+', result)
-			print(getSensor)
+			getSensor_int=[int(x) for x in getSensor]
+			print(getSensor_int)
 			#print(xPosition)
 			#print(str(xPosition)+ "  " + str(yPosition))
 			print(result)
@@ -108,7 +112,7 @@ def read():
 				f.write(str(timeFlag)+" "+str(getCommand)+ " " +str(getCommandD))
 				f.write(" xPosition: "+str(xPosition)+" yPosition: "+str(yPosition))
 				f.write(" dataBaseRudder: "+str(rudder)+" dataBaseSail: "+str(sail))
-				f.write(" "+str(getSensor)+" EOF")
+				f.write(" "+str(getSensor_int)+" EOF")
 				f.write("\n")
 		time.sleep(0.01)
 		
@@ -117,10 +121,11 @@ def auto():
 		global mcapPosition
 		global mcapXYZ
 		global getSensor
+		global getSensor_int
 		global headingD
 		global xPosition
 		global yPosition
-		
+		print(mcapXYZ)
 		'''
 		#database method
 		cursor = db.cursor()
@@ -131,11 +136,29 @@ def auto():
 		temp_x=dataSTAr[4]+0
 		temp_y=dataSTAr[5]+0
 		'''
+		#As calibrated in the mcap. From the motive we can conclude the coordinate of the world in x-z-y. 
+		#Then change up from Y to Z, which means the x-axis is the same, the z-axis changes to -y-axis, the y-axis changes to z-axis.
 		
+		#################
+		#               #
+		#	4		3	#
+		#         		#
+		#   X<--0		#108
+		#       |  		#
+		#	1	|   2	#
+		#		Y  		#
+		#				#
+		########TV#######
 		#Set the coordinate is in the left down corner
-		y0=-5
-		x0=-4
-		print(mcapXYZ[0]+x0,mcapXYZ[1]+y0)
+		#
+		#print(mcapXYZ[0]+x0,mcapXYZ[1]+y0)
+		
+		xL=200
+		xR=-200
+		yU=-100
+		yD=100
+		print("IMU",getSensor_int[5])
+		print("Baro",getSensor_int[13])
 		
 		'''
 		xL=300
