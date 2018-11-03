@@ -171,10 +171,14 @@ void loop()
   Serial.print(" S"); Serial.print(pos1);
   Serial.print(" R"); Serial.print(pos2);
   
+  JY901.GetPress(); Serial.print(" BP");//barometer
+  //Serial.print(JY901.stcPress.lPressure);Serial.print(" BH");//Pa
+  Serial.print((int)JY901.stcPress.lAltitude);//mm
+  
   //print IMU
   JY901.GetAngle(); Serial.print(" H");
   Serial.print((int)((float)JY901.stcAngle.Angle[2]/32768*180)+180);
-  Serial.print(" h"); Serial.print(Setpoint);
+  Serial.print(" h"); Serial.print(int(Setpoint));
 
   int IMU_temp=(int)((float)JY901.stcAngle.Angle[2]/32768*180)+180;
 
@@ -195,11 +199,8 @@ void loop()
   power = voltage * (current/1000); //Convert from mW to W
   Serial.print(" V"); Serial.print(voltage);//V
   Serial.print(" C"); Serial.print(current);//mA
-  Serial.print(" P"); Serial.print(power);//W
-  JY901.GetPress(); Serial.print(" BP");//barometer
-  Serial.print(JY901.stcPress.lPressure);Serial.print(" BH");//Pa
-  Serial.println((int)JY901.stcPress.lAltitude);//mm
-
+  Serial.print(" P"); Serial.println(power);//W
+  
   //auto sail
   if (norm_IMU_temp>0 && norm_IMU_temp<180)
   {
