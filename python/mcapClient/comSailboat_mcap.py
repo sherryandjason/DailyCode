@@ -13,7 +13,7 @@ db=pymysql.connect("192.168.0.104","root","root","star")
 #f=open('record.txt', 'a')
  
 #ser=serial.Serial("COM4", 57600)#For PC
-ser=serial.Serial("COM6", 57600)#For sailboat02
+ser=serial.Serial("COM6", 115200)#For sailboat02
 getSensor=(0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 getSensor_int=(0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 getCommand="starT"
@@ -98,7 +98,7 @@ def read():
 		line = ser.readline()
 		if line:
 			result = line.strip().decode()
-			if result[0] !='S':
+			if len(result)<40:
 				continue
 			resultBlock=result.split()
 			getSensor=re.findall(r'\d+', result)
@@ -112,6 +112,7 @@ def read():
 				f.write(str(timeFlag)+" "+str(getCommand)+ " " +str(getCommandD))
 				f.write(" xPosition: "+str(xPosition)+" yPosition: "+str(yPosition))
 				f.write(" dataBaseRudder: "+str(rudder)+" dataBaseSail: "+str(sail))
+				f.write(" "+str(mcapXYZ))
 				f.write(" "+str(getSensor_int)+" EOF")
 				f.write("\n")
 		time.sleep(0.01)
@@ -156,9 +157,50 @@ def auto():
 		xL=200
 		xR=-200
 		yU=-100
-		yD=100
-		print("IMU",getSensor_int[5])
-		print("Baro",getSensor_int[13])
+		yD=200
+		flagTurnBack=1
+		headingR=215
+		headingL=60
+		IMU=getSensor_int[5]
+		Baro=getSensor_int[2]
+		setPoint=getSensor_int[4]
+		#print("setPoint",setPoint)
+		#print("IMU",getSensor_int[5])
+		#print("Baro",getSensor_int[2])		
+		if mcapXYZ[0]>xL:#need to turn right
+			headingD=60
+			print("Right")
+			if mcapXYZ[0]>300 and mcapXYZ[0]<340 and IMU>140:
+				headingD=headingR
+				print("Right-Come on")
+			else:
+				headingD=60
+				print("Right-Come on-Done")
+			
+		if mcapXYZ[0]<xR:#need to turn left
+			headingD=headingR
+			print("Left")
+		if mcapXYZ[1]>yD:#need to upwind
+			if mcapXYZ[0]>0:
+				headingD=60
+			else:
+				headingD=headingR
+			flagTurnBack=1
+			print("Up")
+		if mcapXYZ[1]<yU and mcapXYZ[0]<abs(xL-50):#need to downwind
+			if setPoint==headingR:
+				headingD=330
+			'''
+			elif mcapXYZ[0]:
+				if flagTurnBack==1:
+					#headingD=220
+					#sendHeading()
+					flagTurnBack=0
+				#time.sleep(0.3)
+				headingD=330
+			'''
+			print("Down")			
+		sendHeading()			
 		
 		'''
 		xL=300
