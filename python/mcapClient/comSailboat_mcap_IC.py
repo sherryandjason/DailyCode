@@ -11,9 +11,12 @@ from NatNetClient import NatNetClient
 db=pymysql.connect("192.168.0.104","root","root","star")
 
 #f=open('record.txt', 'a')
- 
-#ser=serial.Serial("COM4", 57600)#For PC
-ser=serial.Serial("COM6", 115200)#For sailboat02
+
+ser=serial.Serial("COM11", 115200)#For STAr_Server_Ceiling_slim
+#ser=serial.Serial("COM10", 115200)#For STAr_Server_OUTSIDE
+#ser=serial.Serial("COM8", 115200)#For STAr_Server
+#ser=serial.Serial("COM4", 57600)#For Motive PC
+#ser=serial.Serial("COM6", 115200)#For sailboat02
 getSensor=(0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 getSensor_int=(0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 getCommand="starT"
@@ -51,8 +54,18 @@ def send():
 		global rudder
 		global sail
 		
-		getCommand=input()
-		command=getCommand.encode(encoding='utf-8')
+		#getCommand=input()
+		#command=getCommand.encode(encoding='utf-8')
+		#ser.write(command)
+		
+		#database method
+		cursor = db.cursor()
+		cursor.execute("SELECT D FROM data8802 WHERE id=1")
+		dataSTAr = cursor.fetchone()
+		dir=dataSTAr[0]		
+		temp_dir=dataSTAr[0]+0
+		dataBaseCommand='D'+str(temp_dir)
+		command=dataBaseCommand.encode(encoding='utf-8')
 		ser.write(command)
 		
 		#dataBaseCommand='R'+rudder
@@ -109,7 +122,7 @@ def read():
 			#print(str(xPosition)+ "  " + str(yPosition))
 			print(result)
 			timeFlag=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-			with open('record_comSailboat_mcap.txt', 'a') as f:
+			with open('record_comSailboat_mcap_IC.txt', 'a') as f:
 				f.write(str(timeFlag)+" "+str(getCommand)+ " " +str(getCommandD))
 				f.write(" xPosition: "+str(xPosition)+" yPosition: "+str(yPosition))
 				f.write(" dataBaseRudder: "+str(rudder)+" dataBaseSail: "+str(sail))
@@ -255,17 +268,17 @@ def controlFunction():
 
 t1=threading.Thread(target=send)
 t2=threading.Thread(target=read)
-t3=threading.Thread(target=auto)
+#t3=threading.Thread(target=auto)
 #t4=threading.Thread(target=toRecord)
 t5=threading.Thread(target=receivemCap)
 t1.setDaemon(False)
 t2.setDaemon(False)
-t3.setDaemon(False)
+#t3.setDaemon(False)
 #t4.setDaemon(False)
 t5.setDaemon(False)
 t1.start()
 t2.start()
-t3.start()
+#t3.start()
 #t4.start()
 t5.start()
 #f.close()
