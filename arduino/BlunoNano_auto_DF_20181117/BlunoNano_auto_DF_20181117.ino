@@ -72,7 +72,7 @@ Adafruit_INA219 sensor;
 //Define Variables we'll be connecting to
 double Setpoint, Input, Output;
 //Specify the links and initial tuning parameters
-PID myPID(&Input, &Output, &Setpoint,0.5,0,0.01, DIRECT);
+PID myPID(&Input, &Output, &Setpoint,1,0,0.01, DIRECT);
 
 void setup() 
 {
