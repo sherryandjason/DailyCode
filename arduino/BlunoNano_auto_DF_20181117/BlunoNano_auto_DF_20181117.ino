@@ -50,7 +50,7 @@ int zero_angle=280; //anti-clock-wise is increasing
 int norm_IMU_temp=0;
  
 // Sail
-int sail_range_min = 80; //70 // available sail range minimun, vary from boat to boat
+int sail_range_min = 90; //70 // available sail range minimun, vary from boat to boat
 int sail_range_max = 130;  // available sail range maximun, vary from boat to boat
 
 //Servo
@@ -190,7 +190,7 @@ void loop()
     int dead_angle=90-norm_IMU_temp;
     if(dead_angle<20 && dead_angle>-20)
     {
-      myservo1.write(sail_range_min);
+      //myservo1.write(sail_range_min);
       pos1=sail_range_min;
     } else{
       pos1=sail_range_min+abs(dead_angle)/4;
@@ -198,14 +198,15 @@ void loop()
     }
   }
   else {
+    int baseAngle=sail_range_min+abs(90)/4;
     if(norm_IMU_temp>180&&norm_IMU_temp<290){
-      pos1=92.5+(norm_IMU_temp-180)/1.7;
+      pos1=baseAngle+(norm_IMU_temp-180)/1.7;
       if(pos1>sail_range_max){
         pos1=sail_range_max;
       }
     }
     else{
-      pos1=92.5+(360-norm_IMU_temp)/1.7;
+      pos1=baseAngle+(360-norm_IMU_temp)/1.7;
       if(pos1>sail_range_max){
         pos1=sail_range_max;
       }
@@ -252,7 +253,7 @@ void loop()
   if(Setpoint > 179 && Setpoint < 361)
   {
     //condition 2, case 1
-    if (IMU_temp<Setpoint && IMU_temp > Setpoint-180+1){
+    if (IMU_temp<Setpoint && IMU_temp > Setpoint-180+1){//180
       Input=IMU_temp;
       myPID.Compute();
       int Output_temp = 90 + Output;
