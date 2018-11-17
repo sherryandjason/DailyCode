@@ -50,7 +50,7 @@ int zero_angle=280; //anti-clock-wise is increasing
 int norm_IMU_temp=0;
  
 // Sail
-int sail_range_min = 90; //70 // available sail range minimun, vary from boat to boat
+int sail_range_min = 80; //70 // available sail range minimun, vary from boat to boat
 int sail_range_max = 130;  // available sail range maximun, vary from boat to boat
 
 //Servo
@@ -193,7 +193,7 @@ void loop()
       //myservo1.write(sail_range_min);
       pos1=sail_range_min;
     } else{
-      pos1=sail_range_min+abs(dead_angle)/4;
+      pos1=sail_range_min+abs(dead_angle)/6;//4
       myservo1.write(pos1);
     }
   }
