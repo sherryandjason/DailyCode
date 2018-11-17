@@ -36,7 +36,8 @@ def receiveNewFrame( frameNumber, markerSetCount, unlabeledMarkersCount, rigidBo
 
 def receiveRigidBodyFrame( id, position, rotation ):
 	global mcapPosition
-	mcapPosition=position
+	if id==1:
+		mcapPosition=position
 	#print(mcapPosition)
 	#print( "Received frame for rigid body", id )
 	#print( "Received frame for rigid body", position )
@@ -117,10 +118,11 @@ def read():
 			resultBlock=result.split()
 			getSensor=re.findall(r'\d+', result)
 			getSensor_int=[int(x) for x in getSensor]
-			print(getSensor_int)
+			#print(getSensor_int)
 			#print(xPosition)
 			#print(str(xPosition)+ "  " + str(yPosition))
 			print(result)
+			print(mcapXYZ)
 			timeFlag=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			with open('record_comSailboat_mcap_IC.txt', 'a') as f:
 				f.write(str(timeFlag)+" "+str(getCommand)+ " " +str(getCommandD))
@@ -173,10 +175,10 @@ def auto():
 		#
 		#print(mcapXYZ[0]+x0,mcapXYZ[1]+y0)
 		
-		xL=200
-		xR=-200
+		xL=100
+		xR=-300
 		yU=-100
-		yD=250
+		yD=300
 		global flagTurnBack
 		headingL=220
 		headingR=60
