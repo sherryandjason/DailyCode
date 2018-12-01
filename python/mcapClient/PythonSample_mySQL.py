@@ -21,6 +21,7 @@ import pymysql
 from NatNetClient import NatNetClient
 
 #global command=''
+mcap8807=(0,0,0)
 
 mcapPosition=(0,0,0)
 
@@ -31,9 +32,13 @@ def receiveNewFrame( frameNumber, markerSetCount, unlabeledMarkersCount, rigidBo
 
 # This is a callback function that gets connected to the NatNet client. It is called once per rigid body per frame
 def receiveRigidBodyFrame( id, position, rotation ):
+	print(id)
+	global mcap8807
+	if id==2:
+		mcap8807=position
 	db=pymysql.connect("192.168.0.104","root","root","star")
 	global mcapPosition
-	mcapPosition=position
+	mcapPosition=mcap8807
 	print(mcapPosition)
 	#database method
 	cursor = db.cursor()
