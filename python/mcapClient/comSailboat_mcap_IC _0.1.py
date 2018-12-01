@@ -192,6 +192,7 @@ def auto():
 			sendHeading()
 			print("Left")
 		if mcapXYZ[1]>yD and IMU>200:#need to upwind
+			
 			if mcapXYZ[0]>0:
 				headingD=headingR
 			else:
