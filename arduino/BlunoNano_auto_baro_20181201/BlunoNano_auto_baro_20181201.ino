@@ -172,7 +172,7 @@ void loop()
       }
       if(temp_mode==3)//Ban auto
       {
-        mode==3;
+        mode=3;
       }
       inString = "";
     }
@@ -212,7 +212,8 @@ void loop()
   power = voltage * (current/1000); //Convert from mW to W
   Serial.print(" V"); Serial.print(voltage);//V
   Serial.print(" C"); Serial.print(current);//mA
-  Serial.print(" P"); Serial.println(power);//W
+  Serial.print(" P"); Serial.print(power);//W
+  Serial.print(" "); Serial.println(mode);//W
   
   //auto sail
   if(mode!=1 && mode!=3 )//1 - ban sail, 3 - ban all
