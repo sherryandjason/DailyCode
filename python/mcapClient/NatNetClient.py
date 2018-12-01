@@ -35,8 +35,8 @@ class NatNetClient:
 
         # Change this value to the IP address of your local network interface
         #self.localIPAddress = "192.168.0.104" # STAr_Server
-        self.localIPAddress = "192.168.0.106" # Sailboat02
-        #self.localIPAddress = "192.168.0.124" # Motive
+        #self.localIPAddress = "192.168.0.106" # Sailboat02
+        self.localIPAddress = "192.168.0.124" # Motive
 
         # This should match the multicast address listed in Motive's streaming settings.
         self.multicastAddress = "239.255.42.99"
