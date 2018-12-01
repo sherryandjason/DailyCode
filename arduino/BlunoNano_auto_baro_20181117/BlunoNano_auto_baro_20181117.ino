@@ -204,7 +204,7 @@ void loop()
       //myservo1.write(sail_range_max);
       //pos1=sail_range_max;
     } else{
-      pos1=sail_range_max--abs(dead_angle)/4;
+      pos1=sail_range_max-abs(dead_angle)/4;
       myservo1.write(pos1);
     }
   }
