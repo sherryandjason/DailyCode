@@ -175,3 +175,53 @@ plot(1:size(V30D,1),V30D)
 text(size(V30D,1),V30D(end),'30')
 legend('130','120','110','100','90','80','70','60','50','40','30')
 grid on
+
+%% heading
+filter=5;
+H130D=smooth(D220L1S130(S130S:S130E,31),filter);
+H120D=smooth(D220L1S120(S120S:S120E,31),filter);
+H110D=smooth(D220L1S110(S110S:S110E,31),filter);
+H100D=smooth(D220L1S100(S100S:S100E,31),filter);
+H90D=smooth(D220L1S90(S90S:S90E,31),filter);
+H80D=smooth(D220L1S80(S80S:S80E,31),filter);
+H70D=smooth(D220L1S70(S70S:S70E,31),filter);
+H60D=smooth(D220L1S60(S60S:S60E,31),filter);
+H50D=smooth(D220L1S50(S50S:S50E,31),filter);
+H40D=smooth(D220L1S40(S40S:S40E,31),filter);
+H30D=smooth(D220L1S30(S30S:S30E,31),filter);
+
+figure
+plot(1:size(S130S:S130E,2),H130D);
+text(size(S130S:S130E,2),D220L1S130(S130E,31),'130');
+hold on
+plot(1:size(S120S:S120E,2),H120D);
+text(size(S120S:S120E,2),D220L1S120(S120E,31),'120');
+hold on
+plot(1:size(S110S:S110E,2),H110D);
+text(size(S110S:S110E,2),D220L1S110(S110E,31),'110');
+hold on
+plot(1:size(S100S:S100E,2),H100D);
+text(size(S100S:S100E,2),D220L1S100(S100E,31),'100');
+hold on
+plot(1:size(S90S:S90E,2),H90D);
+text(size(S90S:S90E,2),D220L1S90(S90E,31),'90');
+hold on
+plot(1:size(S80S:S80E,2),H80D);
+text(size(S80S:S80E,2),D220L1S80(S80E,31),'80');
+hold on
+plot(1:size(S70S:S70E,2),H70D);
+text(size(S70S:S70E,2),D220L1S70(S70E,31),'70');
+hold on
+plot(1:size(S60S:S60E,2),H60D);
+text(size(S60S:S60E,2),D220L1S60(S60E,31),'60');
+hold on
+plot(1:size(S50S:S50E,2),H50D);
+text(size(S50S:S50E,2),D220L1S50(S50E,31),'50');
+hold on
+plot(1:size(S40S:S40E,2),H40D);
+text(size(S40S:S40E,2),D220L1S40(S40E,31),'40');
+hold on
+plot(1:size(S30S:S30E,2),H30D);
+text(size(S30S:S30E,2),D220L1S30(S30E,31),'30');
+legend('130','120','110','100','90','80','70','60','50','40','30')
+grid on
